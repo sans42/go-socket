@@ -4,19 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://unpkg.com/htmx.org@1.9.2" integrity="sha384-L6OqL9pRWyyFU3+/bjdSri+iIphTN/bvYyM37tICVyOJkWZLpP2vGn6VUEXgzg6h" crossorigin="anonymous"></script>
 </head>
 <body>
-    <h1>Panel</h1>
-    <form hx-post="/tip">
-        <input type="text" name="From" placeholder="From">
-        <input type="text" name="To" placeholder="To">
-        <input type="text" name="Amount" placeholder="Amount">
-        <button type="submit">Send</button>
-    </form>
-    {{ range .Users}}
-        <p>{{ .Username}} - {{.Balance}}</p>
-    {{ end}}
-    <p>End</p>
+    <div class="w-screen h-screen flex flex-col justify-between">
+        <div class="flex flex-col gap-5">
+            <div class="w-full bg-blue-500 px-10 py-5 flex flex-row justify-between items-center">
+                <div class="w-1/2">
+                    <p class="font-semibold text-xl text-white">fyfan.</p>
+                </div>
+                <div class="w-1/2 flex justify-end">
+                    <p class="font-semibold text-white">Landing page :O</p>
+                </div>
+            </div>
+            <div class="w-full flex flex-row px-10 gap-5">
+                <div class="flex flex-col gap-5">
+                    <div class="bg-blue-300 p-4 text-white max-w-sm rounded-sm flex flex-col gap-3">
+                        <p class="text-lg font-semibold">Send tip</p>
+                        <form hx-post="/tip" class="flex flex-col gap-2">
+                            <input type="text" name="From" placeholder="From" class="bg-blue-400 px-2 py-1 outline-none rounded-sm placeholder:text-white">
+                            <input type="text" name="To" placeholder="To" class="bg-blue-400 px-2 py-1 outline-none rounded-sm placeholder:text-white">
+                            <input type="text" name="Amount" placeholder="Amount" class="bg-blue-400 px-2 py-1 outline-none rounded-sm placeholder:text-white">
+                            <button type="submit" class="bg-blue-500 rounded-sm px-5 p-1">Send</button>
+                        </form>
+                    </div>
+                    <div class="bg-blue-300 p-4 text-white max-w-sm rounded-sm flex flex-col gap-3">
+                        <p class="text-lg font-semibold">Send tip</p>
+                        <form hx-post="/tip" class="flex flex-col gap-2">
+                            <input type="text" name="From" placeholder="From" class="bg-blue-400 px-2 py-1 outline-none rounded-sm placeholder:text-white">
+                            <input type="text" name="To" placeholder="To" class="bg-blue-400 px-2 py-1 outline-none rounded-sm placeholder:text-white">
+                            <input type="text" name="Amount" placeholder="Amount" class="bg-blue-400 px-2 py-1 outline-none rounded-sm placeholder:text-white">
+                            <button type="submit" class="bg-blue-500 rounded-sm px-5 p-1">Send</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="flex items-start flex-col w-full gap-2">
+                    <p class="font-semibold text-xl text-blue-500 px-2">Users</p>
+                    <span class="border-b-2 border-blue-500 w-full"></span>
+                    <div class="flex flex-row gap-5 px-2 max-h-96 w-full items-start overflow-y-scroll rounded-sm p-2 flex-wrap">
+                        {{ range .Users}}
+                            <div class="bg-blue-500 p-4 flex flex-col text-white rounded-sm">
+                                <div class="flex flex-row items-center gap-2 border-b-2 pb-2">
+                                    <!-- <img src={{ .AvatarUrl }} alt="" class="bg-blue-600 border-2 border-green-400 rounded-full p-1 w-12 h-12"> -->
+                                    <p class="font-semibold">{{ .Username }}</p>
+                                </div>
+                                <div class="flex flex-row items-center gap-1 pt-2">
+                                    <img src="https://www.growdice.net/assets/wl-b3d08b52.webp" alt="" class="max-w-5">
+                                    <p class="font-semibold">{{ .Balance }}</p>
+                                </div>
+                            </div>
+                        {{end }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="w-full py-3 bg-blue-500 text-white flex items-center justify-center">
+            <p class="font-bold">fyfan made by @Emil</p>
+        </div>
+    </div>
 </body>
 </html>

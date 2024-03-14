@@ -21,7 +21,7 @@ type UserInfo struct{
 	Balance string
 }
 
-var users []User 
+var users []User
 
 
 var upgrader = websocket.Upgrader{
@@ -66,10 +66,14 @@ func reader(conn *websocket.Conn) {
 				ui := UserInfo{Username: uname, Balance: ubal}
 				users = append(users, User{connection: conn, ui: ui})
 			}
+			case "updateBal": {
+				uname, _ := result["Username"].(string)
+				ubal, _ := result["Balance"].(string)
+				updateBalance(uname, ubal)
+			}
 		}
 
 		log.Printf("%v\n", result["ID"])
- 
 	}
 }
  
