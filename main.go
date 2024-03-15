@@ -63,6 +63,7 @@ func reader(conn *websocket.Conn) {
 			case "new": {
 				uname, _ := result["Username"].(string)
 				ubal, _ := result["Balance"].(string)
+				log.Printf("New user\n%v\n%v wls\n", uname, ubal)
 				ui := UserInfo{Username: uname, Balance: ubal}
 				users = append(users, User{connection: conn, ui: ui})
 			}
@@ -73,7 +74,7 @@ func reader(conn *websocket.Conn) {
 			}
 		}
 
-		log.Printf("%v\n", result["ID"])
+		// log.Printf("%v\n", result["ID"])
 	}
 }
  
