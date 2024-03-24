@@ -115,6 +115,7 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 
 func setupAPI(){
 	mux := http.NewServeMux()
+	mux.HandleFunc("/ws", wsEndpoint)
 	// GET ALL USER DATA
 	mux.HandleFunc("GET /users", func(w http.ResponseWriter, r *http.Request){
 		var temp []UserInfo
@@ -128,11 +129,11 @@ func setupAPI(){
 	// TIP
 	mux.HandleFunc("POST /tip/{from}/{to}/{amount}", tip)
 	
-	log.Fatal(http.ListenAndServe(":8081", mux))
+	log.Fatal(http.ListenAndServe(":8080", mux))
 }
 
 func main() {
-	go setupAPI()
-	http.HandleFunc("/ws", wsEndpoint)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	setupAPI()
+	
+	//log.Fatal(http.ListenAndServe(":8080", nil))
 }
