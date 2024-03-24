@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os/user"
 
 	"log"
 	"net/http"
@@ -64,7 +65,7 @@ func reader(conn *websocket.Conn) {
 			case "new": {
 				uname, _ := result["Username"].(string)
 				ubal, _ := result["Balance"].(string)
-				log.Printf("New user\n%v\n%v wls\n", uname, ubal)
+				// log.Printf("New user\n%v\n%v wls\n", uname, ubal)
 				ui := UserInfo{Username: uname, Balance: ubal}
 				users = append(users, User{connection: conn, ui: ui})
 			}
@@ -82,24 +83,26 @@ func reader(conn *websocket.Conn) {
 }
 
 func tip(w http.ResponseWriter, r *http.Request){
-	log.Println("Tip!")
-	time.Sleep(1 * time.Second)
 	from := r.PathValue("from")
 	to := r.PathValue("to")
 	amt := r.PathValue("amount")
-
-	for _, u := range users{
+	queue := r.PathValue("queue")
+	time := r.PathValue("time")
+	
+	for _, u := range user{
 		if u.ui.Username == from{
 			data := map[string]string{
 				"ID": "tip",
 				"to": to,
-				"amt": amt,
+				"amount": amt,
+				"queue", queue,
+				"time", time,
 			}
 			jsonData, _ := json.Marshal(data)
 			u.connection.WriteMessage(1, []byte(jsonData))
 		}
 	}
-	fmt.Fprintf(w, "Sent tip request to client %v", from)
+	// fmt.Fprintf(w, "Sent tip request to client %v", from)
 }
 
 func wsEndpoint(w http.ResponseWriter, r *http.Request) {
@@ -131,13 +134,11 @@ func setupAPI(){
 	})
 
 	// TIP
-	mux.HandleFunc("POST /tip/{from}/{to}/{amount}", tip)
-	
+	mux.HandleFunc("POST /tip/{from}/{to}/{amount}/{queue}/{time}", tip)
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }
 
 func main() {
 	setupAPI()
-	
 	//log.Fatal(http.ListenAndServe(":8080", nil))
 }
