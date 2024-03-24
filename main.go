@@ -95,7 +95,7 @@ func tip(w http.ResponseWriter, r *http.Request){
 			u.connection.WriteMessage(1, []byte(jsonData))
 		}
 	}
-	fmt.Fprintf("Sent tip request to client %v", from)
+	fmt.Fprintf(w, "Sent tip request to client %v", from)
 }
 
 func wsEndpoint(w http.ResponseWriter, r *http.Request) {
