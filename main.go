@@ -2,7 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"html/template"
+	"fmt"
+
 	"log"
 	"net/http"
 	"time"
@@ -17,8 +18,8 @@ type User struct{
 }
 
 type UserInfo struct{
-	Username string
-	Balance string
+	Username string `json:"Username"`
+	Balance string `json:"Balance"`
 }
 
 var users []User
@@ -73,31 +74,15 @@ func reader(conn *websocket.Conn) {
 				updateBalance(uname, ubal)
 			}
 		}
-
-		// log.Printf("%v\n", result["ID"])
 	}
-}
- 
-func homePage(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("index.html"))
-	var ut []UserInfo
-
-	for _, u :=  range users{
-		ut = append(ut, UserInfo{Username: u.ui.Username, Balance: u.ui.Balance})
-	}
-	
-	tUsers := map[string][]UserInfo{
-		"Users": ut,
-	}
-	tmpl.Execute(w, tUsers)
 }
 
 func tip(w http.ResponseWriter, r *http.Request){
 	log.Println("Tip!")
 	time.Sleep(1 * time.Second)
-	from := r.PostFormValue("From")
-	to := r.PostFormValue("To")
-	amt := r.PostFormValue("Amount")
+	from := r.PathValue("from")
+	to := r.PathValue("to")
+	amt := r.PathValue("amount")
 
 	for _, u := range users{
 		if u.ui.Username == from{
@@ -110,7 +95,7 @@ func tip(w http.ResponseWriter, r *http.Request){
 			u.connection.WriteMessage(1, []byte(jsonData))
 		}
 	}
-	w.Write([]byte("Sent tip"))
+	fmt.Fprintf("Sent tip request to client %v", from)
 }
 
 func wsEndpoint(w http.ResponseWriter, r *http.Request) {
@@ -120,21 +105,34 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 	// if connect successfull
 	
-	err = ws.WriteMessage(1, []byte("con"))
+	err = ws.WriteMessage(1, []byte("Connected to server websocket"))
 	
 	if err != nil {
 		log.Println(err)
 	}
 	reader(ws)
 }
- 
-func setupRoutes() {
-	http.HandleFunc("/", homePage)
-	http.HandleFunc("/tip", tip)
-	http.HandleFunc("/ws", wsEndpoint)
+
+func setupAPI(){
+	mux := http.NewServeMux()
+	// GET ALL USER DATA
+	mux.HandleFunc("GET /users", func(w http.ResponseWriter, r *http.Request){
+		var temp []UserInfo
+		for _, u := range users{
+			temp = append(temp, u.ui)
+		}
+		j, _ := json.Marshal(temp)
+		fmt.Fprintf(w, string(j))
+	})
+
+	// TIP
+	mux.HandleFunc("POST /tip/{from}/{to}/{amount}", tip)
+	
+	log.Fatal(http.ListenAndServe(":8081", mux))
 }
 
-func main() {	
-	setupRoutes()
+func main() {
+	go setupAPI()
+	http.HandleFunc("/ws", wsEndpoint)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
