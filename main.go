@@ -71,8 +71,11 @@ func reader(conn *websocket.Conn) {
 			case "updateBal": {
 				uname, _ := result["Username"].(string)
 				ubal, _ := result["Balance"].(string)
-				log.Printf("Update balance for %v to %v\n", uname, ubal)
-				updateBalance(uname, ubal)
+				for i := range len(users){
+					if users[i].ui.Username == uname{
+						users[i].ui.Balance = ubal
+					}
+				}
 			}
 		}
 	}
